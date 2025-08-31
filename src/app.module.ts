@@ -5,20 +5,19 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'ecom-db', 
+      host: 'localhost',
       port: 5432,
-      username: 'ecom_user', 
+      username: 'ecom_user',
       password: 'ecom_pass',
-      database: 'ecom_db', 
+      database: 'ecom_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
+      synchronize: true,
     }),
-    UsersModule,
+    UsersModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
