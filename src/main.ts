@@ -1,9 +1,18 @@
-//This is the application's entry point. It's where the Nest.js application instance is created and the server is started.
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  
+  
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
+
+  await app.listen(3000); // Use port 3001 for user service
+  console.log('User Service is running on http://localhost:3000');
 }
 bootstrap();
