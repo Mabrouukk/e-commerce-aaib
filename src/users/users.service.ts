@@ -30,7 +30,7 @@ export class UsersService {
 
 
     const user = this.usersRepository.create({
-      ...createUserDto,
+      ...createUserDto, //disc
       password: hashedPassword, 
     });
 
