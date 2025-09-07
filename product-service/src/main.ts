@@ -11,7 +11,7 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
 
-  await app.listen(3002); // Different port from user-service
-  console.log('Product Service is running on http://localhost:3002');
+  await app.listen(3001); // Different port from user-service
+  console.log('Product Service is running on http://localhost:3001');
 }
 bootstrap();

@@ -12,7 +12,7 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
 
-  await app.listen(3000); // Use port 3001 for user service
+  await app.listen(3000); 
   console.log('User Service is running on http://localhost:3000');
 }
 bootstrap();
