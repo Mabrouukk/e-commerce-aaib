@@ -20,3 +20,8 @@ export class User {
   @Field(() => Date)
   updatedAt: Date;
 }
+@ObjectType()
+export class AuthPayload {
+  @Field()
+  access_token: string;
+}

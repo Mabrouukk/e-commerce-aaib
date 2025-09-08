@@ -1,41 +1,48 @@
-import { Resolver, Query, Args } from '@nestjs/graphql';
-import { HttpService } from '@nestjs/axios';
-import { User } from './models/user.model';
-import { firstValueFrom } from 'rxjs';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { User, AuthPayload } from './models/user.model';
+import { CreateUserInput, LoginInput } from './models/dto/user.input';
+import { UsersService } from './users.service';
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @Query(() => [User], { description: 'Get all users' })
-  async users(): Promise<User[]> {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get('http://localhost:3000/users')
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error('Failed to fetch users from user service');
-    }
+  @Mutation(() => User, { description: 'Register a new user' })
+  async registerUser(
+    @Args('createUserInput') createUserInput: CreateUserInput
+  ): Promise<User> {
+    return this.usersService.createUser(createUserInput);
   }
 
-  @Query(() => User, { 
-    description: 'Get a user by ID',
-    nullable: true 
-  })
+  @Mutation(() => AuthPayload, { description: 'Login user and return token' })
+  async login(
+    @Args('loginInput') loginInput: LoginInput
+  ): Promise<AuthPayload> {
+    return this.usersService.login(loginInput);
+  }
+
+  @Query(() => User, { description: 'Get user by ID' })
   async user(
-    @Args('id', { type: () => String }) id: string
-  ): Promise<User | null> {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`http://localhost:3000/users/${id}`)
-      );
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        return null;
-      }
-      throw new Error('Failed to fetch user from user service');
+    @Args('id') id: string,
+    @Context() context: any
+  ): Promise<User> {
+    const token = this.extractTokenFromContext(context);
+    if (!token) throw new Error('Authentication token required');
+    return this.usersService.getUserById(id, token);
+  }
+
+  @Query(() => [User], { description: 'Get all users (requires authentication)' })
+  async users(@Context() context: any): Promise<User[]> {
+    const token = this.extractTokenFromContext(context);
+    if (!token) throw new Error('Authentication token required');
+    return this.usersService.getAllUsers(token);
+  }
+
+  private extractTokenFromContext(context: any): string | undefined {
+    const authHeader = context.req?.headers?.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7);
     }
+    return undefined;
   }
 }

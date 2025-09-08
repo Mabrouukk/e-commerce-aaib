@@ -1,0 +1,79 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type AuthPayload {
+  access_token: String!
+}
+
+type Product {
+  _id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  tags: [String!]!
+  category: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Query {
+  """Get user by ID"""
+  user(id: String!): User!
+
+  """Get all users (requires authentication)"""
+  users: [User!]!
+
+  """Get all products"""
+  products: [Product!]!
+
+  """Get product by ID"""
+  product(id: String!): Product!
+}
+
+type Mutation {
+  """Register a new user"""
+  registerUser(createUserInput: CreateUserInput!): User!
+
+  """Login user and return token"""
+  login(loginInput: LoginInput!): AuthPayload!
+
+  """Create a new product"""
+  createProduct(createProductInput: CreateProductInput!): Product!
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  tags: [String!]!
+  category: String!
+}
