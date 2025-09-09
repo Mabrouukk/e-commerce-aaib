@@ -16,6 +16,10 @@ export class ProductsResolver {
   async product(@Args('id') id: string): Promise<Product> {
     return this.productsService.getProductById(id);
   }
+  @Query(() => [Product], { description: 'Get products by category' })
+  async productsByCategory(@Args('category') category: string): Promise<Product[]> {
+    return this.productsService.getProductsByCategory(category);
+  }
 
   @Mutation(() => Product, { description: 'Create a new product' })
   async createProduct(

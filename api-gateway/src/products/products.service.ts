@@ -36,6 +36,22 @@ export class ProductsService {
       );
     }
   }
+  async getProductsByCategory(category: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.productServiceUrl}/products`, {
+          params: { category },
+        })
+      );
+      return response.data;
+    } catch (error) {
+      throw new HttpException(
+        error.response?.data?.message || 'Failed to fetch products by category',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+  }
 
   async createProduct(createProductInput: CreateProductInput) {
     try {

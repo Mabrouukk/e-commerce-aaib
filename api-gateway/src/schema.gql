@@ -44,6 +44,9 @@ type Query {
 
   """Get product by ID"""
   product(id: String!): Product!
+
+  """Get products by category"""
+  productsByCategory(category: String!): [Product!]!
 }
 
 type Mutation {
