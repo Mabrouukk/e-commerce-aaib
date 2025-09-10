@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",//was commonjs
+    "moduleResolution": "nodenext",//was node
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true, // Allow default imports from modules with no default export. This does not affect code emit, just typechecking.
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",//was ES2017
+    "sourceMap": true, // debuge the ts file directly
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true, // Enable strict null checks and undifined
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
