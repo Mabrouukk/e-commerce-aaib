@@ -12,13 +12,15 @@ import { HttpService } from '@nestjs/axios';
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
+    private orderRepository: Repository<Order>, 
     @InjectRepository(OrderItem)
     private orderItemRepository: Repository<OrderItem>,
     private readonly httpService: HttpService,
     private readonly dataSource: DataSource,
   ) {}
-
+  async getAllOrders (): Promise<Order[]> {
+    return this.orderRepository.find({ relations: ['items'] });
+  }
   async createOrder(createOrderDto: CreateOrderDto, authHeader: string): Promise<Order> {
   const { userId, items } = createOrderDto;
 

@@ -1,12 +1,18 @@
 // src/orders/orders.controller.ts
-import { Controller, Post, Body, BadRequestException, Headers } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Headers,Get } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './entities/order.entities';
+import { Param } from '@nestjs/common';
+
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+  @Get()
+  async findAll(): Promise<Order[]> {
+    return this.ordersService.getAllOrders();
+  }
 
   @Post()
   async create(
