@@ -21,12 +21,27 @@ export class OrdersService {
   async getAllOrders (): Promise<Order[]> {
     return this.orderRepository.find({ relations: ['items'] });
   }
+
+  async getOrderById(id: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({ 
+      where: { id }, 
+      relations: ['items'] 
+    });
+    
+    if (!order) {
+      throw new BadRequestException(`Order with ID ${id} not found`);
+    }
+    
+    return order;
+  }
   async createOrder(createOrderDto: CreateOrderDto, authHeader: string): Promise<Order> {
   const { userId, items } = createOrderDto;
+  const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3000';
+  const productServiceUrl = process.env.PRODUCT_SERVICE_URL || 'http://localhost:3001';
 
   try {
     const userResponse = await firstValueFrom(
-      this.httpService.get(`http://localhost:3000/users/${userId}`, {
+      this.httpService.get(`${userServiceUrl}/users/${userId}`, {
         headers: { Authorization: authHeader }, 
       }),
     );
@@ -44,7 +59,7 @@ export class OrdersService {
     for (const item of items) {
   try {
     const productResponse = await firstValueFrom(
-      this.httpService.get(`http://localhost:3001/products/${item.productId}`),
+      this.httpService.get(`${productServiceUrl}/products/${item.productId}`),
     );
     const product = productResponse.data;
 

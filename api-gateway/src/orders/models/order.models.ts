@@ -19,5 +19,5 @@ export class Order {
   items: OrderItem[];
 
   @Field()
-  createdAt: Date;
+  createdAt: string;
 }

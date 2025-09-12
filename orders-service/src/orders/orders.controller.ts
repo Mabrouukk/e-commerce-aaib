@@ -14,6 +14,11 @@ export class OrdersController {
     return this.ordersService.getAllOrders();
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Order> {
+    return this.ordersService.getOrderById(parseInt(id));
+  }
+
   @Post()
   async create(
     @Body() createOrderDto: CreateOrderDto,
