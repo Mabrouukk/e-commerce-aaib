@@ -6,52 +6,39 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: CreateProductDto, @Request() req) {
     return this.productsService.create(createProductDto);
   }
 
   @Get()
-  findAll(@Query('category') category?: string) {
-    if (category) {
-      return this.productsService.findByCategory(category);
-    }
+  findAll(@Request() req) {
     return this.productsService.findAll();
   }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @Request() req) {
     return this.productsService.findOne(id);
   }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Request() req) {
     return this.productsService.update(id, updateProductDto);
   }
+
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string, @Request() req) {
     return this.productsService.remove(id);
-  }
-  @Patch(':id/stock')
-  updateStock(
-    @Param('id') id: string,
-    @Body() body: { quantity: number }
-  ) {
-    return this.productsService.updateStock(id, body.quantity);
   }
 }

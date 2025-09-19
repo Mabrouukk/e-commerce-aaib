@@ -1,0 +1,170 @@
+services:
+  # PostgreSQL Database
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: ecommerce-postgres-prod
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # MongoDB Database
+  mongo-db:
+    image: mongo:6.0
+    container_name: ecommerce-mongo-prod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: ecommerce
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: ecommerce-user-service-prod
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres-db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres123
+      DATABASE_NAME: ecommerce
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Product Service
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: ecommerce-product-service-prod
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://admin:admin123@mongo-db:27017/ecommerce?authSource=admin
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      mongo-db:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Orders Service
+  orders-service:
+    build:
+      context: ./orders-service
+      dockerfile: Dockerfile
+    container_name: ecommerce-orders-service-prod
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres-db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres123
+      DATABASE_NAME: ecommerce
+      USER_SERVICE_URL: http://user-service:3000
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      PORT: 3003
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: ecommerce-api-gateway-prod
+    environment:
+      NODE_ENV: production
+      USER_SERVICE_URL: http://user-service:3000
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      ORDERS_SERVICE_URL: http://orders-service:3003
+      PORT: 3002
+    ports:
+      - "3002:3002"
+    depends_on:
+      user-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      orders-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend-prod
+    environment:
+      NODE_ENV: production
+      VITE_API_URL: http://localhost:3002/graphql
+    ports:
+      - "3004:3004"
+    depends_on:
+      api-gateway:
+        condition: service_started
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+# Named volumes for data persistence
+volumes:
+  postgres_data:
+    driver: local
+  mongo_data:
+    driver: local
+
+# Custom network for service communication
+networks:
+  ecommerce-network:
+    driver: bridge
+

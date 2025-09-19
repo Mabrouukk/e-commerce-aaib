@@ -32,6 +32,22 @@ type Product {
   updatedAt: DateTime!
 }
 
+type OrderItem {
+  id: ID!
+  productId: String!
+  quantity: Int!
+  price: Int!
+}
+
+type Order {
+  id: ID!
+  userId: Int!
+  total: Int!
+  status: String!
+  items: [OrderItem!]!
+  createdAt: String!
+}
+
 type Query {
   """Get user by ID"""
   user(id: String!): User!
@@ -47,6 +63,12 @@ type Query {
 
   """Get products by category"""
   productsByCategory(category: String!): [Product!]!
+
+  """Get order by ID"""
+  order(id: Int!): Order!
+
+  """Get all orders"""
+  orders: [Order!]!
 }
 
 type Mutation {
@@ -58,6 +80,9 @@ type Mutation {
 
   """Create a new product"""
   createProduct(createProductInput: CreateProductInput!): Product!
+
+  """Create a new order"""
+  createOrder(createOrderInput: CreateOrderInput!): Order!
 }
 
 input CreateUserInput {
@@ -79,4 +104,14 @@ input CreateProductInput {
   stock: Float!
   tags: [String!]!
   category: String!
+}
+
+input CreateOrderInput {
+  userId: Int!
+  items: [CreateOrderItemInput!]!
+}
+
+input CreateOrderItemInput {
+  productId: String!
+  quantity: Int!
 }
