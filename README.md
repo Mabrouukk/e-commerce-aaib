@@ -4,12 +4,13 @@ A modern, containerized e-commerce platform built with Nest.js, TypeScript, and 
 
 ## 🏗️ Architecture Overview
 
-The platform consists of four main components:
+The platform consists of five main components:
 
 - **User Service** (Port 3000): Handles user authentication, registration, and JWT token management
 - **Product Service** (Port 3001): Manages product catalog with flexible schema using MongoDB
 - **Orders Service** (Port 3003): Orchestrates order creation and management with inter-service communication
 - **API Gateway** (Port 3002): Provides a unified GraphQL API that aggregates data from all services
+- **Frontend** (Port 3004): Modern React application with TypeScript and Tailwind CSS
 
 ## 🛠️ Technology Stack
 
@@ -19,6 +20,7 @@ The platform consists of four main components:
 | Product Service | Nest.js + TypeScript | MongoDB + Mongoose | Product catalog management |
 | Orders Service | Nest.js + TypeScript | PostgreSQL + TypeORM | Order processing & business logic |
 | API Gateway | Nest.js + TypeScript | N/A | GraphQL API aggregation |
+| Frontend | React + TypeScript | N/A | User interface & client-side logic |
 
 ## 🚀 Quick Start
 
@@ -41,6 +43,7 @@ The platform consists of four main components:
    ```
 
 3. **Access the services**
+   - **Frontend Application**: http://localhost:3004
    - **GraphQL Playground**: http://localhost:3002/graphql
    - **User Service API**: http://localhost:3000
    - **Product Service API**: http://localhost:3001
@@ -70,6 +73,11 @@ npm run start:dev
 cd api-gateway
 npm install
 npm run start:dev
+
+# Frontend
+cd frontend
+npm install
+npm run dev
 ```
 
 ## 📊 Database Configuration
@@ -228,6 +236,7 @@ e-commerce-aaib/
 ├── product-service/       # Product catalog service
 ├── orders-service/        # Order management service
 ├── api-gateway/          # GraphQL API gateway
+├── frontend/             # React frontend application
 ├── docker-compose.yml    # Container orchestration
 └── README.md            # This file
 ```

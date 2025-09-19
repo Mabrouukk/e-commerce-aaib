@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database
   postgres-db:
     image: postgres:15-alpine
-    container_name: ecommerce-postgres
+    container_name: ecommerce-postgres-prod
     environment:
       POSTGRES_DB: ecommerce
       POSTGRES_USER: postgres
@@ -18,11 +18,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # MongoDB Database
   mongo-db:
     image: mongo:6.0
-    container_name: ecommerce-mongo
+    container_name: ecommerce-mongo-prod
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
@@ -38,13 +39,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # User Service
   user-service:
     build:
       context: ./user-service
       dockerfile: Dockerfile
-    container_name: ecommerce-user-service
+    container_name: ecommerce-user-service-prod
     environment:
       NODE_ENV: production
       DATABASE_HOST: postgres-db
@@ -68,7 +70,7 @@ services:
     build:
       context: ./product-service
       dockerfile: Dockerfile
-    container_name: ecommerce-product-service
+    container_name: ecommerce-product-service-prod
     environment:
       NODE_ENV: production
       MONGODB_URI: mongodb://admin:admin123@mongo-db:27017/ecommerce?authSource=admin
@@ -87,7 +89,7 @@ services:
     build:
       context: ./orders-service
       dockerfile: Dockerfile
-    container_name: ecommerce-orders-service
+    container_name: ecommerce-orders-service-prod
     environment:
       NODE_ENV: production
       DATABASE_HOST: postgres-db
@@ -116,7 +118,7 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
-    container_name: ecommerce-api-gateway
+    container_name: ecommerce-api-gateway-prod
     environment:
       NODE_ENV: production
       USER_SERVICE_URL: http://user-service:3000
@@ -141,7 +143,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: ecommerce-frontend
+    container_name: ecommerce-frontend-prod
     environment:
       NODE_ENV: production
       VITE_API_URL: http://localhost:3002/graphql
@@ -165,3 +167,4 @@ volumes:
 networks:
   ecommerce-network:
     driver: bridge
+
